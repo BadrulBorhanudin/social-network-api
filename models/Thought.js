@@ -7,12 +7,12 @@ const thoughtSchema = new Schema(
       type: String,
       required: true,
       minlength: 1,
-      maxlength: 280,
+      maxlenght: 280,
     },
     createdAt: {
       type: Date,
       default: Date.now,
-      get: timestamp => new Date(timestamp).toLocaleString()
+      get: (timestamp) => new Date(timestamp).toLocaleString(),
     },
     username: {
       type: String,
@@ -22,14 +22,14 @@ const thoughtSchema = new Schema(
   },
   {
     toJSON: {
-     getters: true, 
-     virtuals: true,
+      getters: true,
+      virtuals: true,
     },
     id: false,
   }
 );
 
-thoughtSchema.virtual('reactionCount').get(function() {
+thoughtSchema.virtual('reactionCount').get(function () {
   return this.reactions.length;
 });
 
