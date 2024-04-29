@@ -204,8 +204,6 @@ This will not be a model, but rather will be used as the `reaction` field's subd
 
 ## Note
 
-You are required to submit BOTH of the following for review:
-
 * [A walkthrough video demonstrating the functionality of the application and all of the acceptance criteria being met.](https://1drv.ms/v/s!AhjTQobLPW72rzMVWCibHIB6Aj5M)
 
 * [The URL of the GitHub repository. Give the repository a unique name and include a README describing the project.](https://github.com/BadrulBorhanudin/social-network-api)
