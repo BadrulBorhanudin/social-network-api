@@ -29,12 +29,17 @@ const ThoughtController = {
   async createThought(req, res) {
     try {
       const thought = await Thought.create(req.body);
+      const user = await User.findByIdAndUpdate(
+        req.body.userId,
+        { $push: { thoughts: thought._id } },
+        { new: true }
+      );
       res.status(201).json(thought);
     } catch (err) {
       res.status(500).json(err);
     }
   },
-
+  
   // Handler for the "delete thought" API endpoint
   async deleteThought(req, res) {
     try {

@@ -1,9 +1,10 @@
-const { User } = require('../models');
+const { User, Thought } = require('../models');
 
 const UserController = {
   // 1. Get all users
   getAllUsers(req, res) {
     User.find({})
+      .populate('thoughts') // Populate the thoughts associated with each user
       .then((userData) => res.json(userData))
       .catch((err) => res.status(500).json(err));
   },
@@ -11,6 +12,7 @@ const UserController = {
   // 2. Get one user by ID
   getUserById(req, res) {
     User.findById(req.params.userId)
+      .populate('thoughts') // Populate the thoughts associated with the user
       .then((userData) => res.json(userData))
       .catch((err) => res.status(500).json(err));
   },
@@ -36,14 +38,24 @@ const UserController = {
 
   // 5. Delete user
   deleteUserById(req, res) {
-    User.findOneAndDelete(req.params.id)
+    User.findOneAndDelete({ _id: req.params.userId })
       .then((userData) => {
         if (!userData) {
           return res.status(404).json({ message: 'User not found' });
         }
-        res.json({ message: 'User deleted successfully' });
+        // Chain another then block for Thought deletion
+        return Thought.deleteMany({ _id: { $in: userData.thoughts } });
       })
-      .catch((err) => res.status(500).json(err));
+      .then(() =>
+        res.status(200).json({
+          message: 'User and associated thoughts deleted successfully',
+        })
+      )
+      .catch((err) => {
+        if (!res.headersSent) {
+          res.status(500).json(err);
+        }
+      });
   },
 
   // 6. Add friend to user's friend list
@@ -73,14 +85,17 @@ const UserController = {
         if (!dbUserData) {
           return res.status(404).json({ message: 'No user with this id!' });
         }
-        // check if friend was removed
+        // Check if friend was removed
         const removed = !dbUserData.friends.includes(params.friendId);
-        // return response with appropriate message
+        // Return response with appropriate message
         if (removed) {
-          res.json({ message: 'Friend removed successfully!', dbUserData });
-        } else {
-          res.json(dbUserData);
+          return res.json({
+            message: 'Friend removed successfully!',
+            dbUserData,
+          });
         }
+        // If friend was not removed, return the updated user data
+        return res.status(200).json(dbUserData);
       })
       .catch((err) => res.status(400).json(err));
   },
